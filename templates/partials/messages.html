@@ -1,0 +1,8 @@
+{% if messages %}
+  <div class="visually-hidden" aria-live="polite">
+    {% for message in messages %}
+      <span data-django-message="{{ message.tags }}">{{ message }}</span>
+    {% endfor %}
+  </div>
+{% endif %}
+<div data-toast-region></div>

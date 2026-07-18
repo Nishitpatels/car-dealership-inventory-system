@@ -1,27 +1,18 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-
 {% load static %}
-
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-</head>
-
-<body>
-
-{% include 'partials/navbar.html' %}
-
-{% include 'partials/sidebar.html' %}
-
-{% include 'partials/messages.html' %}
-
-{% block content %}
-{% endblock %}
-
-{% include 'partials/footer.html' %}
-
-</body>
-
+<!doctype html>
+<html lang="{% block html_lang %}en{% endblock %}">
+  <head>
+    {% include 'partials/head.html' %}
+    <title>{% block title %}Nexus Motors | Premium Vehicle Inventory{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="dealer-body{% block body_class %}{% endblock %}" data-page="{% block data_page %}home{% endblock %}" data-root="{% block data_root %}{% endblock %}">
+    {% include 'partials/navbar.html' %}
+    {% include 'partials/sidebar.html' %}
+    <main id="page-content">{% block content %}{% endblock %}</main>
+    {% include 'partials/footer.html' %}
+    {% include 'partials/messages.html' %}
+    {% include 'partials/scripts.html' %}
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>
