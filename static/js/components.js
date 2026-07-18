@@ -18,6 +18,21 @@ window.DealerComponents = (() => {
     const mapped = routeMap()[target || path];
     return mapped ? `${mapped}${suffix}` : `${root()}${path}`;
   };
+  const authState = () => {
+    if (window.DealerAuthState) return window.DealerAuthState;
+    const source = document.getElementById('dealer-auth-state');
+    if (!source) return {};
+    try {
+      window.DealerAuthState = JSON.parse(source.textContent);
+    } catch (error) {
+      window.DealerAuthState = {};
+    }
+    return window.DealerAuthState;
+  };
+  const csrfInput = () => {
+    const token = authState().csrfToken || '';
+    return token ? `<input type="hidden" name="csrfmiddlewaretoken" value="${token}">` : '';
+  };
   const isAdminPage = (page) => ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 
@@ -38,8 +53,7 @@ window.DealerComponents = (() => {
             </div>
             <div class="header-actions d-flex align-items-center gap-2">
               <button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button>
-              <a class="btn-outline-dealer text-center" href="${url('pages/login.html')}">Log in</a>
-              <a class="btn-primary-gradient text-center" href="${url('pages/register.html')}">Register <i class="fa-solid fa-arrow-right ms-1"></i></a>
+              ${authState().isSuperuser ? `<a class="btn-outline-dealer text-center" href="${url('pages/profile.html')}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/dashboard.html')}">Dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a><a class="btn-outline-dealer text-center" href="${url('pages/logout.html')}">Logout</a>` : `<a class="btn-primary-gradient text-center" href="${url('pages/login.html')}">Log in <i class="fa-solid fa-arrow-right ms-1"></i></a>`}
             </div>
           </div>
         </nav>
@@ -61,7 +75,7 @@ window.DealerComponents = (() => {
         ${nav('settings', 'Settings', 'fa-gear')}
         ${nav('profile', 'Profile', 'fa-user-gear')}
         <div class="side-caption">Workspace</div>
-        <a class="admin-nav-link" href="${url('index.html')}"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log out</span></a>
+        <a class="admin-nav-link" href="${url('pages/logout.html')}"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log out</span></a>
       </aside>`;
   }
 
@@ -161,5 +175,5 @@ window.DealerComponents = (() => {
 
   function adminPageHeader(title, subtitle, crumb) { return `<div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"><div><div class="tiny-label mb-2">Dealer operations</div><h1 class="admin-page-title mb-1">${title}</h1><p class="muted small mb-0">${subtitle}</p></div>${breadcrumb([{ label: 'Admin', href: 'pages/dashboard.html' }, { label: crumb || title }])}</div>`; }
 
-  return { data, url, root, isAdminPage, installShell, vehicleCard, statCard, statusBadge, breadcrumb, pageHero, filterPanel, emptyState, adminPageHeader };
+  return { data, url, root, authState, csrfInput, isAdminPage, installShell, vehicleCard, statCard, statusBadge, breadcrumb, pageHero, filterPanel, emptyState, adminPageHeader };
 })();

@@ -112,6 +112,15 @@
     }
   }
 
+  function showServerMessages() {
+    const iconMap = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+    const titleMap = { success: 'Success', error: 'Action needed', warning: 'Notice', info: 'Information' };
+    document.querySelectorAll('[data-django-message]').forEach((message) => {
+      const level = (message.dataset.djangoMessage || 'info').split(' ')[0];
+      showToast(titleMap[level] || 'Information', message.textContent.trim(), iconMap[level] || 'fa-circle-info');
+    });
+  }
+
   document.addEventListener('click', (event) => {
     const control = event.target.closest('[data-action]');
     if (!control) return;
@@ -146,4 +155,5 @@
   window.addEventListener('scroll', () => document.getElementById('siteHeader')?.classList.toggle('is-scrolled', window.scrollY > 12), { passive: true });
   C.installShell(page);
   renderPage();
+  showServerMessages();
 })();

@@ -5,6 +5,7 @@
   "pages/contact.html": "{% url 'core:contact' %}",
   "pages/404.html": "{% url 'core:not_found' %}",
   "pages/login.html": "{% url 'authentication:login' %}",
+  "pages/logout.html": "{% url 'authentication:logout' %}",
   "pages/register.html": "{% url 'authentication:register' %}",
   "pages/inventory.html": "{% url 'inventory:inventory' %}",
   "pages/vehicle-details.html": "{% url 'inventory:vehicle_details' %}",
@@ -19,5 +20,12 @@
   "pages/profile.html": "{% url 'dashboard:profile' %}",
   "pages/settings.html": "{% url 'dashboard:settings' %}",
   "pages/purchase-history.html": "{% url 'purchases:purchase_history' %}"
+}
+</script>
+<script id="dealer-auth-state" type="application/json">
+{
+  "isAuthenticated": {{ request.user.is_authenticated|yesno:"true,false" }},
+  "isSuperuser": {{ request.user.is_superuser|yesno:"true,false" }},
+  "csrfToken": "{{ csrf_token|escapejs }}"
 }
 </script>
