@@ -2,7 +2,22 @@
 window.DealerComponents = (() => {
   const data = window.DealerData;
   const root = () => document.body.dataset.root || '';
-  const url = (path) => `${root()}${path}`;
+  const routeMap = () => {
+    if (window.DealerRouteMap) return window.DealerRouteMap;
+    const source = document.getElementById('dealer-url-map');
+    if (!source) return {};
+    try {
+      window.DealerRouteMap = JSON.parse(source.textContent);
+    } catch (error) {
+      window.DealerRouteMap = {};
+    }
+    return window.DealerRouteMap;
+  };
+  const url = (path) => {
+    const [, target, suffix = ''] = path.match(/^([^?#]+)(.*)$/) || [];
+    const mapped = routeMap()[target || path];
+    return mapped ? `${mapped}${suffix}` : `${root()}${path}`;
+  };
   const isAdminPage = (page) => ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 

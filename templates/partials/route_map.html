@@ -1,0 +1,23 @@
+<script id="dealer-url-map" type="application/json">
+{
+  "index.html": "{% url 'core:home' %}",
+  "pages/about.html": "{% url 'core:about' %}",
+  "pages/contact.html": "{% url 'core:contact' %}",
+  "pages/404.html": "{% url 'core:not_found' %}",
+  "pages/login.html": "{% url 'authentication:login' %}",
+  "pages/register.html": "{% url 'authentication:register' %}",
+  "pages/inventory.html": "{% url 'inventory:inventory' %}",
+  "pages/vehicle-details.html": "{% url 'inventory:vehicle_details' %}",
+  "pages/search-results.html": "{% url 'inventory:search_results' %}",
+  "pages/manage-vehicles.html": "{% url 'inventory:manage_vehicles' %}",
+  "pages/add-vehicle.html": "{% url 'inventory:add_vehicle' %}",
+  "pages/update-vehicle.html": "{% url 'inventory:update_vehicle' %}",
+  "pages/delete-confirmation.html": "{% url 'inventory:delete_confirmation' %}",
+  "pages/inventory-management.html": "{% url 'inventory:inventory_management' %}",
+  "pages/dashboard.html": "{% url 'dashboard:dashboard' %}",
+  "pages/user-management.html": "{% url 'dashboard:user_management' %}",
+  "pages/profile.html": "{% url 'dashboard:profile' %}",
+  "pages/settings.html": "{% url 'dashboard:settings' %}",
+  "pages/purchase-history.html": "{% url 'purchases:purchase_history' %}"
+}
+</script>
