@@ -5,7 +5,9 @@
   "pages/contact.html": "{% url 'core:contact' %}",
   "pages/404.html": "{% url 'core:not_found' %}",
   "pages/login.html": "{% url 'authentication:login' %}",
+  "pages/admin-login.html": "{% url 'authentication:admin_login' %}",
   "pages/logout.html": "{% url 'authentication:logout' %}",
+  "pages/user-profile.html": "{% url 'authentication:profile' %}",
   "pages/register.html": "{% url 'authentication:register' %}",
   "pages/inventory.html": "{% url 'inventory:inventory' %}",
   "pages/vehicle-details.html": "{% url 'inventory:vehicle_details' %}",
@@ -24,8 +26,13 @@
 </script>
 <script id="dealer-auth-state" type="application/json">
 {
-  "isAuthenticated": {{ request.user.is_authenticated|yesno:"true,false" }},
-  "isSuperuser": {{ request.user.is_superuser|yesno:"true,false" }},
+  "isAuthenticated": {% if request.user.is_authenticated %}true{% else %}false{% endif %},
+  "isSuperuser": {% if request.user.is_superuser %}true{% else %}false{% endif %},
+  "isStaff": {% if request.user.is_staff %}true{% else %}false{% endif %},
+  "username": "{{ request.user.username|default:''|escapejs }}",
+  "firstName": "{{ request.user.first_name|default:''|escapejs }}",
+  "lastName": "{{ request.user.last_name|default:''|escapejs }}",
+  "email": "{{ request.user.email|default:''|escapejs }}",
   "csrfToken": "{{ csrf_token|escapejs }}"
 }
 </script>
