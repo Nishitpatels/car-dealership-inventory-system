@@ -20,8 +20,129 @@
 
   function renderPage() {
     document.getElementById('page-content').innerHTML = P.render(page);
+    initVehicleImageUpload();
     if (window.AOS) window.AOS.init({ duration: 650, once: true, offset: 30 });
     requestAnimationFrame(initRevenueChart);
+  }
+
+  function initVehicleImageUpload() {
+    const input = document.getElementById('vehicleImage');
+    if (!input || input.dataset.uploadEnhanced === 'true') return;
+
+    input.dataset.uploadEnhanced = 'true';
+    const form = input.closest('form');
+    const card = input.closest('.admin-form-card');
+    const dropzone = card?.querySelector('.dropzone');
+    const existingPreview = card?.querySelector('img');
+    const originalImage = existingPreview?.getAttribute('src') || '';
+
+    if (existingPreview) {
+      existingPreview.id = 'vehicleImagePreview';
+      existingPreview.dataset.vehicleImagePreview = 'true';
+    }
+
+    const preview = existingPreview || document.createElement('img');
+    if (!existingPreview) {
+      preview.id = 'vehicleImagePreview';
+      preview.dataset.vehicleImagePreview = 'true';
+      preview.className = 'w-100 rounded-3 mt-3 d-none';
+      preview.alt = 'Selected vehicle image preview';
+      input.insertAdjacentElement('afterend', preview);
+    }
+
+    const status = document.createElement('div');
+    status.className = 'form-help mt-3';
+    status.setAttribute('data-upload-status', '');
+    status.textContent = originalImage ? 'Current vehicle image loaded.' : 'No image selected yet.';
+    preview.insertAdjacentElement('afterend', status);
+
+    const progress = document.createElement('div');
+    progress.className = 'progress mt-3 d-none';
+    progress.style.height = '8px';
+    progress.innerHTML = '<div class="progress-bar" data-upload-progress style="width:0%"></div>';
+    status.insertAdjacentElement('afterend', progress);
+
+    const progressBar = progress.querySelector('[data-upload-progress]');
+    const setProgress = (value) => {
+      progress.classList.remove('d-none');
+      progressBar.style.width = `${value}%`;
+      progressBar.setAttribute('aria-valuenow', String(value));
+    };
+    const completeProgress = () => {
+      setProgress(100);
+      progressBar.classList.add('bg-success');
+      status.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>Image ready. Save the vehicle to upload it.';
+    };
+    const failPreview = (message) => {
+      progress.classList.add('d-none');
+      progressBar.style.width = '0%';
+      status.innerHTML = `<i class="fa-solid fa-circle-xmark me-1"></i>${message}`;
+      if (originalImage) {
+        preview.src = originalImage;
+        preview.classList.remove('d-none');
+      } else {
+        preview.removeAttribute('src');
+        preview.classList.add('d-none');
+      }
+    };
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      progressBar.classList.remove('bg-success');
+
+      if (!file) {
+        failPreview(originalImage ? 'Image selection cleared. Existing image will be kept.' : 'No image selected yet.');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        input.value = '';
+        failPreview('Please select a valid image file.');
+        return;
+      }
+
+      status.innerHTML = `<i class="fa-solid fa-file-image me-1"></i>Selected: ${file.name}`;
+      setProgress(35);
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        preview.src = event.target.result;
+        preview.alt = `Preview of ${file.name}`;
+        preview.classList.remove('d-none');
+        setProgress(72);
+        window.setTimeout(completeProgress, 180);
+      };
+      reader.onerror = () => {
+        input.value = '';
+        failPreview('Image preview failed. Please choose another image.');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    form?.addEventListener('reset', () => {
+      window.setTimeout(() => {
+        progress.classList.add('d-none');
+        progressBar.style.width = '0%';
+        progressBar.classList.remove('bg-success');
+        if (originalImage) {
+          preview.src = originalImage;
+          preview.classList.remove('d-none');
+          status.textContent = 'Current vehicle image restored.';
+        } else {
+          preview.removeAttribute('src');
+          preview.classList.add('d-none');
+          status.textContent = 'No image selected yet.';
+        }
+      });
+    });
+
+    form?.addEventListener('submit', () => {
+      if (!input.files?.length) return;
+      status.innerHTML = `<i class="fa-solid fa-cloud-arrow-up me-1"></i>Uploading ${input.files[0].name}...`;
+      setProgress(100);
+      progressBar.classList.add('bg-success');
+      dropzone?.classList.add('opacity-75');
+    });
   }
 
   function initRevenueChart() {
