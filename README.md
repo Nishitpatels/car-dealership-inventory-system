@@ -439,7 +439,6 @@ Open your browser and visit:
 | Page | URL |
 |------|-----|
 | Application | http://127.0.0.1:8000/ |
-| Django Admin | http://127.0.0.1:8000/admin/ |
 
 To stop the server:
 
