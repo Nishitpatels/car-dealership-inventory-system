@@ -99,6 +99,7 @@ def serialize_user(user):
         "role": role,
         "status": "Active" if user.is_active else "Inactive",
         "lastLogin": format_date(user.last_login),
+        "joinedAt": format_date(user.date_joined),
         "isSuperuser": user.is_superuser,
     }
 

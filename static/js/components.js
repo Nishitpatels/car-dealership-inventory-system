@@ -38,7 +38,7 @@ window.DealerComponents = (() => {
     const auth = authState();
     return `${auth.firstName || ''} ${auth.lastName || ''}`.trim() || auth.username || 'Account';
   };
-  const isAdminPage = (page) => authState().isSuperuser && ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
+  const isAdminPage = (page) => authState().isSuperuser && ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'invite-user', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 
   function publicHeader(page) {

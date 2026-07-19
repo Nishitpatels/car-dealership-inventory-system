@@ -65,6 +65,18 @@ class UserRegistrationForm(forms.Form):
         )
 
 
+class AdminInviteUserForm(UserRegistrationForm):
+    is_active = forms.BooleanField(required=False, initial=True, label="Active account")
+    is_staff = forms.BooleanField(required=False, initial=False, label="Staff access")
+
+    def save(self):
+        user = super().save()
+        user.is_active = self.cleaned_data.get("is_active", False)
+        user.is_staff = self.cleaned_data.get("is_staff", False)
+        user.save(update_fields=["is_active", "is_staff"])
+        return user
+
+
 class BaseLoginForm(forms.Form):
     username = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
