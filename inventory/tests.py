@@ -48,10 +48,20 @@ class VehicleSearchTests(TestCase):
         )
 
     def test_search_by_make(self):
-        response = self.client.get(reverse("inventory:inventory"), {"make": "BMW"})
+        response = self.client.get(reverse("inventory:inventory"), {"make": " BM "})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "BMW")
         self.assertNotContains(response, "Hyundai Creta")
+
+    def test_search_by_partial_make(self):
+        response = self.client.get(reverse("inventory:search_results"), {"query": " Hyu "})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hyundai")
+
+    def test_search_by_full_vehicle_name(self):
+        response = self.client.get(reverse("inventory:search_results"), {"query": "BMW X5"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "BMW")
 
     def test_search_by_model(self):
         response = self.client.get(reverse("inventory:search_results"), {"model": "Creta"})
@@ -59,7 +69,7 @@ class VehicleSearchTests(TestCase):
         self.assertContains(response, "Creta")
 
     def test_search_by_category(self):
-        response = self.client.get(reverse("inventory:search_results"), {"category": "Compact SUV"})
+        response = self.client.get(reverse("inventory:search_results"), {"category": "SUV"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Creta")
 
@@ -85,7 +95,22 @@ class VehicleSearchTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "BMW")
-        self.assertNotContains(response, "Hyundai")
+        self.assertNotContains(response, '"model": "Creta"')
+
+    def test_inventory_pagination_and_filters(self):
+        for index in range(8):
+            Vehicle.objects.create(
+                make="Toyota",
+                model=f"Paginated {index}",
+                category="SUV",
+                price=Decimal("30000.00"),
+                quantity=1,
+                description="Pagination vehicle",
+            )
+        response = self.client.get(reverse("inventory:search_results"), {"make": "Toyota", "page": 2})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"current": 2')
+        self.assertContains(response, "make=Toyota")
 
 
 class VehicleAdminCrudTests(TestCase):

@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from core.models import ContactMessage
+
 User = get_user_model()
 
 
@@ -49,6 +51,45 @@ class DashboardTests(TestCase):
         self.assertRedirects(response, reverse("dashboard:user_management"))
         self.admin.refresh_from_db()
         self.assertTrue(self.admin.is_active)
+
+    def test_admin_profile_updates(self):
+        self.client.login(username="admin", password="StrongPass123!")
+        response = self.client.post(
+            reverse("dashboard:profile"),
+            {
+                "first_name": "Admin",
+                "last_name": "Manager",
+                "email": "manager@example.com",
+            },
+        )
+        self.assertRedirects(response, reverse("dashboard:profile"))
+        self.admin.refresh_from_db()
+        self.assertEqual(self.admin.first_name, "Admin")
+        self.assertEqual(self.admin.email, "manager@example.com")
+
+    def test_contact_messages_visible_to_admin(self):
+        ContactMessage.objects.create(
+            name="Alex",
+            email="alex@example.com",
+            subject="Availability",
+            message="Is this SUV available?",
+        )
+        self.client.login(username="admin", password="StrongPass123!")
+        response = self.client.get(reverse("dashboard:contact_messages"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "alex@example.com")
+
+    def test_delete_contact_message(self):
+        message = ContactMessage.objects.create(
+            name="Alex",
+            email="alex@example.com",
+            subject="Availability",
+            message="Is this SUV available?",
+        )
+        self.client.login(username="admin", password="StrongPass123!")
+        response = self.client.post(reverse("dashboard:delete_contact_message"), {"message_id": message.pk})
+        self.assertRedirects(response, reverse("dashboard:contact_messages"))
+        self.assertFalse(ContactMessage.objects.filter(pk=message.pk).exists())
 
 
 class InviteUserTests(TestCase):

@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
+from .forms import ContactMessageForm
 
 
 def home(request):
@@ -10,6 +13,18 @@ def about(request):
 
 
 def contact(request):
+    if request.method == "POST":
+        form = ContactMessageForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your message has been sent successfully.")
+            return redirect("core:contact")
+
+        for field, errors in form.errors.items():
+            label = form.fields[field].label if field in form.fields else "Contact"
+            for error in errors:
+                messages.error(request, f"{label}: {error}")
+
     return render(request, "core/contact.html")
 
 

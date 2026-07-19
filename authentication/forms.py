@@ -126,7 +126,12 @@ class AdminLoginForm(BaseLoginForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["first_name", "last_name", "username", "email"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = True
 
     def clean_first_name(self):
         return self.cleaned_data["first_name"].strip()
@@ -134,8 +139,20 @@ class UserProfileForm(forms.ModelForm):
     def clean_last_name(self):
         return self.cleaned_data["last_name"].strip()
 
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if User.objects.filter(username__iexact=username).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Username already exists.")
+        return username
+
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
         if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
             raise ValidationError("Email already exists.")
         return email
+
+
+class AdminProfileForm(UserProfileForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]

@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from authentication.access import admin_required
-from authentication.forms import AdminInviteUserForm
+from authentication.forms import AdminInviteUserForm, AdminProfileForm
+from core.models import ContactMessage
 
 
 def _add_form_errors_to_messages(request, form, default_label="Form"):
@@ -39,6 +40,14 @@ def invite_user(request):
 
 @admin_required
 def profile(request):
+    if request.method == "POST":
+        form = AdminProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Admin profile updated successfully.")
+            return redirect("dashboard:profile")
+        _add_form_errors_to_messages(request, form, "Profile")
+
     return render(request, "dashboard/profile.html")
 
 
@@ -63,3 +72,17 @@ def deactivate_user(request):
         messages.success(request, f"{user.username} has been deactivated.")
 
     return redirect("dashboard:user_management")
+
+
+@admin_required
+def contact_messages(request):
+    return render(request, "dashboard/contact_messages.html")
+
+
+@require_POST
+@admin_required
+def delete_contact_message(request):
+    message = get_object_or_404(ContactMessage, pk=request.POST.get("message_id"))
+    message.delete()
+    messages.success(request, "Contact message deleted successfully.")
+    return redirect("dashboard:contact_messages")

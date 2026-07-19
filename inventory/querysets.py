@@ -17,21 +17,29 @@ def vehicle_search_queryset(params, base_queryset=None):
     availability = (params.get("availability") or params.get("status") or "").strip()
 
     if query:
-        queryset = queryset.filter(
+        query_filter = (
             Q(make__icontains=query)
             | Q(model__icontains=query)
             | Q(category__icontains=query)
             | Q(description__icontains=query)
         )
+        for term in query.split():
+            query_filter |= (
+                Q(make__icontains=term)
+                | Q(model__icontains=term)
+                | Q(category__icontains=term)
+                | Q(description__icontains=term)
+            )
+        queryset = queryset.filter(query_filter)
 
     if make:
-        queryset = queryset.filter(make__iexact=make)
+        queryset = queryset.filter(make__icontains=make)
 
     if model:
         queryset = queryset.filter(model__icontains=model)
 
     if category:
-        queryset = queryset.filter(category__iexact=category)
+        queryset = queryset.filter(category__icontains=category)
 
     try:
         if min_price:

@@ -38,7 +38,7 @@ window.DealerComponents = (() => {
     const auth = authState();
     return `${auth.firstName || ''} ${auth.lastName || ''}`.trim() || auth.username || 'Account';
   };
-  const isAdminPage = (page) => authState().isSuperuser && ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'invite-user', 'profile', 'settings'].includes(page);
+  const isAdminPage = (page) => authState().isSuperuser && ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'invite-user', 'contact-messages', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 
   function publicHeader(page) {
@@ -77,6 +77,7 @@ window.DealerComponents = (() => {
         ${nav('manage-vehicles', 'Vehicles', 'fa-car', stats.totalVehicles || data.vehicles.length)}
         ${nav('inventory-management', 'Inventory', 'fa-boxes-stacked', inventoryAlerts || '')}
         ${nav('purchase-history', 'Purchases', 'fa-receipt')}
+        ${nav('contact-messages', 'Messages', 'fa-envelope', (data.contactMessages || []).length || '')}
         <div class="side-caption">Account</div>
         ${nav('user-management', 'Users', 'fa-users')}
         ${nav('settings', 'Settings', 'fa-gear')}

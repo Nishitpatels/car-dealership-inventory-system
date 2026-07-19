@@ -135,6 +135,7 @@ class UserProfileTests(TestCase):
             {
                 "first_name": "New",
                 "last_name": "Customer",
+                "username": "newcustomer",
                 "email": "newcustomer@example.com",
             },
         )
@@ -142,6 +143,7 @@ class UserProfileTests(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "New")
         self.assertEqual(self.user.last_name, "Customer")
+        self.assertEqual(self.user.username, "newcustomer")
         self.assertEqual(self.user.email, "newcustomer@example.com")
 
     def test_profile_rejects_duplicate_email(self):
@@ -150,9 +152,24 @@ class UserProfileTests(TestCase):
             {
                 "first_name": "New",
                 "last_name": "Customer",
+                "username": "customer",
                 "email": "other@example.com",
             },
         )
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, "customer@example.com")
+
+    def test_profile_rejects_duplicate_username(self):
+        response = self.client.post(
+            reverse("authentication:profile"),
+            {
+                "first_name": "New",
+                "last_name": "Customer",
+                "username": "other",
+                "email": "customer@example.com",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, "customer")

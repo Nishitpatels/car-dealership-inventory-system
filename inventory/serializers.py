@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from django.utils import timezone
 
+from core.models import ContactMessage
+
 
 def format_price(value):
     amount = Decimal(value)
@@ -104,6 +106,17 @@ def serialize_user(user):
     }
 
 
+def serialize_contact_message(message):
+    return {
+        "id": message.pk,
+        "name": message.name,
+        "email": message.email,
+        "subject": message.subject,
+        "message": message.message,
+        "submittedAt": format_date(message.submitted_at),
+    }
+
+
 def build_stats(vehicles, purchases=None, users=None):
     purchases = list(purchases or [])
     users = list(users or [])
@@ -157,12 +170,12 @@ def build_revenue_chart(purchases):
     }
 
 
-def serialize_inventory(vehicles, purchases=None, users=None, request_user=None):
+def serialize_inventory(vehicles, purchases=None, users=None, request_user=None, pagination=None, contact_messages=None, brands_source=None):
     vehicles = list(vehicles)
     purchases = list(purchases or [])
     users = list(users or [])
     items = [serialize_vehicle(vehicle) for vehicle in vehicles]
-    brands = sorted({vehicle["make"] for vehicle in items})
+    brands = sorted({vehicle.make for vehicle in (brands_source or vehicles)})
     serialized_purchases = [serialize_purchase(purchase) for purchase in purchases]
     serialized_users = [serialize_user(user) for user in users]
     current_user_purchases = serialized_purchases
@@ -175,6 +188,8 @@ def serialize_inventory(vehicles, purchases=None, users=None, request_user=None)
         "purchases": serialized_purchases,
         "userPurchases": current_user_purchases,
         "users": serialized_users,
+        "contactMessages": [serialize_contact_message(message) for message in (contact_messages or [])],
         "stats": build_stats(vehicles, purchases, users),
         "revenueChart": build_revenue_chart(purchases),
+        "pagination": pagination or {},
     }

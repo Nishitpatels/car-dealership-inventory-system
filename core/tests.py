@@ -1,7 +1,9 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 
 from . import views
+from .models import ContactMessage
 
 
 class ErrorPageTests(TestCase):
@@ -21,3 +23,25 @@ class ErrorPageTests(TestCase):
         response = views.server_error(request)
         self.assertEqual(response.status_code, 500)
         self.assertContains(response, "dealer-inventory-data", status_code=500)
+
+
+class ContactMessageTests(TestCase):
+    def test_contact_message_is_saved(self):
+        response = self.client.post(
+            reverse("core:contact"),
+            {
+                "name": "Alex Morgan",
+                "email": "Alex@Example.COM",
+                "subject": "Vehicle availability",
+                "message": "Is the Toyota SUV still available?",
+            },
+        )
+        self.assertRedirects(response, reverse("core:contact"))
+        message = ContactMessage.objects.get()
+        self.assertEqual(message.name, "Alex Morgan")
+        self.assertEqual(message.email, "alex@example.com")
+
+    def test_contact_message_requires_fields(self):
+        response = self.client.post(reverse("core:contact"), {"name": "", "email": "", "subject": "", "message": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ContactMessage.objects.count(), 0)
