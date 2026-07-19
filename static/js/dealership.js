@@ -115,9 +115,11 @@
   function showServerMessages() {
     const iconMap = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
     const titleMap = { success: 'Success', error: 'Action needed', warning: 'Notice', info: 'Information' };
-    document.querySelectorAll('[data-django-message]').forEach((message) => {
+    document.querySelectorAll('[data-django-message]').forEach((message, index) => {
       const level = (message.dataset.djangoMessage || 'info').split(' ')[0];
-      showToast(titleMap[level] || 'Information', message.textContent.trim(), iconMap[level] || 'fa-circle-info');
+      window.setTimeout(() => {
+        showToast(titleMap[level] || 'Information', message.textContent.trim(), iconMap[level] || 'fa-circle-info');
+      }, index * 450);
     });
   }
 

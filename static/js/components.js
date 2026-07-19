@@ -33,6 +33,11 @@ window.DealerComponents = (() => {
     const token = authState().csrfToken || '';
     return token ? `<input type="hidden" name="csrfmiddlewaretoken" value="${token}">` : '';
   };
+  const profileUrl = () => authState().isSuperuser ? url('pages/profile.html') : url('pages/user-profile.html');
+  const displayName = () => {
+    const auth = authState();
+    return `${auth.firstName || ''} ${auth.lastName || ''}`.trim() || auth.username || 'Account';
+  };
   const isAdminPage = (page) => ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 
@@ -53,7 +58,7 @@ window.DealerComponents = (() => {
             </div>
             <div class="header-actions d-flex align-items-center gap-2">
               <button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button>
-              ${authState().isSuperuser ? `<a class="btn-outline-dealer text-center" href="${url('pages/profile.html')}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/dashboard.html')}">Dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a><a class="btn-outline-dealer text-center" href="${url('pages/logout.html')}">Logout</a>` : `<a class="btn-primary-gradient text-center" href="${url('pages/login.html')}">Log in <i class="fa-solid fa-arrow-right ms-1"></i></a>`}
+              ${authState().isSuperuser ? `<a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/dashboard.html')}">Dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a><a class="btn-outline-dealer text-center" href="${url('pages/logout.html')}">Logout</a>` : authState().isAuthenticated ? `<a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/logout.html')}">Logout <i class="fa-solid fa-arrow-right ms-1"></i></a>` : `<a class="btn-outline-dealer text-center" href="${url('pages/login.html')}">Login</a><a class="btn-primary-gradient text-center" href="${url('pages/register.html')}">Register <i class="fa-solid fa-arrow-right ms-1"></i></a>`}
             </div>
           </div>
         </nav>
@@ -84,7 +89,7 @@ window.DealerComponents = (() => {
       <header class="admin-topbar">
         <div class="container-fluid d-flex align-items-center justify-content-between gap-3 px-3 px-md-4">
           <div class="d-flex align-items-center gap-3"><button class="header-icon-btn d-lg-none" data-action="toggle-sidebar" aria-label="Open admin navigation"><i class="fa-solid fa-bars"></i></button><div class="admin-topbar-search position-relative"><i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 muted small"></i><input class="form-control dealer-control ps-5" aria-label="Search dealership" placeholder="Search vehicles, purchases..."></div></div>
-          <div class="d-flex align-items-center gap-2"><button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button><button class="header-icon-btn position-relative" data-action="toast-notifications" aria-label="View notifications"><i class="fa-regular fa-bell"></i><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span></button><a class="topbar-avatar" href="${url('pages/profile.html')}" aria-label="Open profile">AM</a></div>
+          <div class="d-flex align-items-center gap-2"><button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button><button class="header-icon-btn position-relative" data-action="toast-notifications" aria-label="View notifications"><i class="fa-regular fa-bell"></i><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span></button><a class="topbar-avatar" href="${url('pages/profile.html')}" aria-label="Open profile">${(displayName().split(' ').map(part => part[0]).join('').slice(0, 2) || 'AM').toUpperCase()}</a></div>
         </div>
       </header>`;
   }
@@ -175,5 +180,5 @@ window.DealerComponents = (() => {
 
   function adminPageHeader(title, subtitle, crumb) { return `<div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"><div><div class="tiny-label mb-2">Dealer operations</div><h1 class="admin-page-title mb-1">${title}</h1><p class="muted small mb-0">${subtitle}</p></div>${breadcrumb([{ label: 'Admin', href: 'pages/dashboard.html' }, { label: crumb || title }])}</div>`; }
 
-  return { data, url, root, authState, csrfInput, isAdminPage, installShell, vehicleCard, statCard, statusBadge, breadcrumb, pageHero, filterPanel, emptyState, adminPageHeader };
+  return { data, url, root, authState, csrfInput, profileUrl, displayName, isAdminPage, installShell, vehicleCard, statCard, statusBadge, breadcrumb, pageHero, filterPanel, emptyState, adminPageHeader };
 })();
