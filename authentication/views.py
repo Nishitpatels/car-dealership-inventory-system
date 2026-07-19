@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from .access import is_admin_user, login_required_frontend
-from .forms import AdminLoginForm, UserLoginForm, UserRegistrationForm
+from .forms import AdminLoginForm, UserLoginForm, UserProfileForm, UserRegistrationForm
 
 
 def _apply_remember_me(request):
@@ -95,6 +95,18 @@ def logout(request):
 
 @login_required_frontend
 def profile(request):
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect("authentication:profile")
+
+        for field, errors in form.errors.items():
+            label = form.fields[field].label if field in form.fields else "Profile"
+            for error in errors:
+                messages.error(request, f"{label}: {error}")
+
     return render(request, "authentication/profile.html")
 
 

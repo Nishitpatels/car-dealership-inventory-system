@@ -1,4 +1,4 @@
-/* Page bootstrapping and static UI behaviour. No API calls or backend logic. */
+/* Page bootstrapping and shared UI behaviour. Django POST workflows are layered in django-pages.js. */
 (function () {
   const C = window.DealerComponents;
   const P = window.DealerPages;
@@ -151,7 +151,12 @@
     if (action === 'toggle-sidebar') document.getElementById('adminSidebar')?.classList.toggle('open');
     if (action === 'stock-change') changeStock(control.dataset.id, control.dataset.delta);
     if (action === 'delete-mock') showToast('Delete action acknowledged', 'This is a frontend-only confirmation; the inventory record is unchanged.', 'fa-trash');
-    if (action === 'toast-notifications') showToast('3 notifications', 'Two low-inventory warnings and one new purchase are waiting.', 'fa-bell');
+    if (action === 'toast-notifications') {
+      const stats = D.stats || {};
+      const alerts = Number(stats.criticalAlerts || 0);
+      const purchases = Number(stats.totalPurchases || 0);
+      showToast(`${alerts + purchases} notifications`, `${alerts} inventory alert${alerts === 1 ? '' : 's'} and ${purchases} purchase record${purchases === 1 ? '' : 's'} are available.`, 'fa-bell');
+    }
     if (action === 'mock-toast') showToast('Demo action', 'This interface action is ready to be connected to Django later.', 'fa-sparkles');
   });
 

@@ -87,11 +87,13 @@ window.DealerComponents = (() => {
   }
 
   function adminHeader() {
+    const stats = data.stats || {};
+    const notifications = Number(stats.criticalAlerts || 0) + Number(stats.totalPurchases || 0);
     return `
       <header class="admin-topbar">
         <div class="container-fluid d-flex align-items-center justify-content-between gap-3 px-3 px-md-4">
-          <div class="d-flex align-items-center gap-3"><button class="header-icon-btn d-lg-none" data-action="toggle-sidebar" aria-label="Open admin navigation"><i class="fa-solid fa-bars"></i></button><div class="admin-topbar-search position-relative"><i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 muted small"></i><input class="form-control dealer-control ps-5" aria-label="Search dealership" placeholder="Search vehicles, purchases..."></div></div>
-          <div class="d-flex align-items-center gap-2"><button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button><button class="header-icon-btn position-relative" data-action="toast-notifications" aria-label="View notifications"><i class="fa-regular fa-bell"></i><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span></button><a class="topbar-avatar" href="${url('pages/profile.html')}" aria-label="Open profile">${(displayName().split(' ').map(part => part[0]).join('').slice(0, 2) || 'AM').toUpperCase()}</a></div>
+          <div class="d-flex align-items-center gap-3"><button class="header-icon-btn d-lg-none" data-action="toggle-sidebar" aria-label="Open admin navigation"><i class="fa-solid fa-bars"></i></button><form class="admin-topbar-search position-relative" data-search-form><i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 muted small"></i><input class="form-control dealer-control ps-5" name="query" aria-label="Search dealership" placeholder="Search vehicles, purchases..."></form></div>
+          <div class="d-flex align-items-center gap-2"><button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button><button class="header-icon-btn position-relative" data-action="toast-notifications" aria-label="View notifications"><i class="fa-regular fa-bell"></i>${notifications ? `<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${notifications}</span>` : ''}</button><a class="topbar-avatar" href="${url('pages/profile.html')}" aria-label="Open profile">${(displayName().split(' ').map(part => part[0]).join('').slice(0, 2) || 'AM').toUpperCase()}</a></div>
         </div>
       </header>`;
   }

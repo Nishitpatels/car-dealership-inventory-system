@@ -121,3 +121,21 @@ class AdminLoginForm(BaseLoginForm):
         if self.user and not (self.user.is_staff and self.user.is_superuser):
             raise ValidationError("Permission denied. Superuser access is required.")
         return cleaned_data
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+    def clean_first_name(self):
+        return self.cleaned_data["first_name"].strip()
+
+    def clean_last_name(self):
+        return self.cleaned_data["last_name"].strip()
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("Email already exists.")
+        return email

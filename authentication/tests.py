@@ -111,3 +111,48 @@ class AccessControlTests(TestCase):
     def test_anonymous_user_redirected_from_purchase_history(self):
         response = self.client.get(reverse("purchases:purchase_history"))
         self.assertEqual(response.status_code, 302)
+
+
+class UserProfileTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="customer",
+            email="customer@example.com",
+            password="StrongPass123!",
+            first_name="Old",
+            last_name="Name",
+        )
+        self.other = User.objects.create_user(
+            username="other",
+            email="other@example.com",
+            password="StrongPass123!",
+        )
+        self.client.login(username="customer", password="StrongPass123!")
+
+    def test_user_can_update_profile(self):
+        response = self.client.post(
+            reverse("authentication:profile"),
+            {
+                "first_name": "New",
+                "last_name": "Customer",
+                "email": "newcustomer@example.com",
+            },
+        )
+        self.assertRedirects(response, reverse("authentication:profile"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "New")
+        self.assertEqual(self.user.last_name, "Customer")
+        self.assertEqual(self.user.email, "newcustomer@example.com")
+
+    def test_profile_rejects_duplicate_email(self):
+        response = self.client.post(
+            reverse("authentication:profile"),
+            {
+                "first_name": "New",
+                "last_name": "Customer",
+                "email": "other@example.com",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "customer@example.com")

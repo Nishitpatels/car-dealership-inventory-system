@@ -24,7 +24,7 @@ def admin_required(view_func):
 
         if not is_admin_user(request.user):
             messages.error(request, "Permission denied. Superuser access is required.")
-            return render(request, "core/404.html", status=403)
+            return render(request, "core/403.html", status=403)
 
         return view_func(request, *args, **kwargs)
 

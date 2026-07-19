@@ -72,6 +72,21 @@ class VehicleSearchTests(TestCase):
         self.assertContains(response, "BMW")
         self.assertNotContains(response, "Creta")
 
+    def test_combined_search_filters(self):
+        response = self.client.get(
+            reverse("inventory:search_results"),
+            {
+                "make": "BMW",
+                "model": "X5",
+                "category": "Luxury SUV",
+                "min_price": "70000",
+                "max_price": "90000",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "BMW")
+        self.assertNotContains(response, "Hyundai")
+
 
 class VehicleAdminCrudTests(TestCase):
     def setUp(self):
@@ -109,6 +124,21 @@ class VehicleAdminCrudTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Vehicle.objects.filter(make="Toyota", model="Camry").exists())
+
+    def test_add_vehicle_rejects_negative_price(self):
+        response = self.client.post(
+            reverse("inventory:add_vehicle"),
+            {
+                "make": "Toyota",
+                "model": "Camry",
+                "category": "Sedan",
+                "price": "-1.00",
+                "quantity": "5",
+                "description": "Reliable sedan",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Vehicle.objects.filter(make="Toyota", model="Camry").exists())
 
     def test_update_vehicle(self):
         response = self.client.post(
