@@ -537,13 +537,13 @@ The following screenshots showcase the major features and user interface of the 
 ## 📸 Sample Preview
 
 <p align="center">
-    <img src="screenshots/dashboard.png" alt="Dashboard" width="48%">
-    <img src="screenshots/inventory.png" alt="Inventory" width="48%">
+    <img src="static/screenshots/Admin Dashboard.png" alt=" Admin Dashboard" width="48%">
+    <img src="static/screenshots/inventory.png" alt="Inventory" width="48%">
 </p>
 
 <p align="center">
-    <img src="screenshots/search.png" alt="Search" width="48%">
-    <img src="screenshots/test_results.png" alt="Test Results" width="48%">
+    <img src="static/screenshots/Search.png" alt="Search" width="48%">
+    <img src="static/screenshots/add vehicle.png" alt="Add Vehicle" width="48%">
 </p>
 
 ---
