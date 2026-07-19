@@ -38,7 +38,7 @@ window.DealerComponents = (() => {
     const auth = authState();
     return `${auth.firstName || ''} ${auth.lastName || ''}`.trim() || auth.username || 'Account';
   };
-  const isAdminPage = (page) => ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
+  const isAdminPage = (page) => authState().isSuperuser && ['dashboard', 'manage-vehicles', 'add-vehicle', 'update-vehicle', 'delete-confirmation', 'inventory-management', 'purchase-history', 'user-management', 'profile', 'settings'].includes(page);
   const active = (page, expected) => page === expected ? 'active' : '';
 
   function publicHeader(page) {
@@ -58,7 +58,7 @@ window.DealerComponents = (() => {
             </div>
             <div class="header-actions d-flex align-items-center gap-2">
               <button class="header-icon-btn" data-action="toggle-theme" aria-label="Toggle colour theme"><i class="fa-solid fa-moon"></i></button>
-              ${authState().isSuperuser ? `<a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/dashboard.html')}">Dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a><a class="btn-outline-dealer text-center" href="${url('pages/logout.html')}">Logout</a>` : authState().isAuthenticated ? `<a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/logout.html')}">Logout <i class="fa-solid fa-arrow-right ms-1"></i></a>` : `<a class="btn-outline-dealer text-center" href="${url('pages/login.html')}">Login</a><a class="btn-primary-gradient text-center" href="${url('pages/register.html')}">Register <i class="fa-solid fa-arrow-right ms-1"></i></a>`}
+              ${authState().isSuperuser ? `<a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/dashboard.html')}">Dashboard <i class="fa-solid fa-arrow-right ms-1"></i></a><a class="btn-outline-dealer text-center" href="${url('pages/logout.html')}">Logout</a>` : authState().isAuthenticated ? `<a class="btn-outline-dealer text-center" href="${url('pages/user-dashboard.html')}">Dashboard</a><a class="btn-outline-dealer text-center" href="${profileUrl()}">Profile</a><a class="btn-primary-gradient text-center" href="${url('pages/logout.html')}">Logout <i class="fa-solid fa-arrow-right ms-1"></i></a>` : `<a class="btn-outline-dealer text-center" href="${url('pages/login.html')}">Login</a><a class="btn-primary-gradient text-center" href="${url('pages/register.html')}">Register <i class="fa-solid fa-arrow-right ms-1"></i></a>`}
             </div>
           </div>
         </nav>
@@ -67,13 +67,15 @@ window.DealerComponents = (() => {
 
   function adminSidebar(page) {
     const nav = (target, label, icon, badge = '') => `<a class="admin-nav-link ${active(page, target)}" href="${url(`pages/${target === 'dashboard' ? 'dashboard' : target}.html`)}"><i class="fa-solid ${icon}"></i><span>${label}</span>${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}</a>`;
+    const stats = data.stats || {};
+    const inventoryAlerts = Number(stats.lowStock || 0) + Number(stats.outOfStock || 0);
     return `
       <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
         <div class="sidebar-head"><a class="d-flex align-items-center gap-2" href="${url('index.html')}"><span class="logo-mark"><i class="fa-solid fa-car-side"></i></span><span class="brand-name">Nexus<span class="text-gradient">Motors</span></span></a></div>
         <div class="side-caption">Operations</div>
         ${nav('dashboard', 'Dashboard', 'fa-grid-2')}
-        ${nav('manage-vehicles', 'Vehicles', 'fa-car', '8')}
-        ${nav('inventory-management', 'Inventory', 'fa-boxes-stacked', '2')}
+        ${nav('manage-vehicles', 'Vehicles', 'fa-car', stats.totalVehicles || data.vehicles.length)}
+        ${nav('inventory-management', 'Inventory', 'fa-boxes-stacked', inventoryAlerts || '')}
         ${nav('purchase-history', 'Purchases', 'fa-receipt')}
         <div class="side-caption">Account</div>
         ${nav('user-management', 'Users', 'fa-users')}
@@ -168,6 +170,7 @@ window.DealerComponents = (() => {
     return `<aside class="filter-panel" aria-label="Vehicle filters"><div class="d-flex justify-content-between align-items-center mb-4"><h2 class="filter-panel-title mb-0">Filter inventory</h2><button class="btn btn-link form-link p-0" data-action="clear-filters">Reset</button></div>
       <div class="mb-3"><label class="filter-label" for="inventorySearch">Search</label><input class="form-control dealer-control" id="inventorySearch" data-filter="query" placeholder="Make, model, or keyword"></div>
       <div class="mb-3"><label class="filter-label" for="filterMake">Make</label><select class="form-select dealer-select" id="filterMake" data-filter="make"><option value="">All makes</option>${data.brands.map(brand => `<option>${brand}</option>`).join('')}</select></div>
+      <div class="mb-3"><label class="filter-label" for="filterModel">Model</label><input class="form-control dealer-control" id="filterModel" data-filter="model" placeholder="e.g. X5, Creta"></div>
       <div class="mb-3"><label class="filter-label" for="filterCategory">Category</label><select class="form-select dealer-select" id="filterCategory" data-filter="category"><option value="">All categories</option><option>Luxury SUV</option><option>Luxury Sedan</option><option>Electric SUV</option><option>Premium SUV</option><option>Performance Coupe</option><option>Family SUV</option></select></div>
       <div class="row g-2 mb-3"><div class="col-6"><label class="filter-label" for="filterMinPrice">Min price</label><input class="form-control dealer-control" type="number" id="filterMinPrice" data-filter="min-price" placeholder="$20k"></div><div class="col-6"><label class="filter-label" for="filterMaxPrice">Max price</label><input class="form-control dealer-control" type="number" id="filterMaxPrice" data-filter="max-price" placeholder="$80k"></div></div>
       <div class="mb-3"><label class="filter-label" for="filterTransmission">Transmission</label><select class="form-select dealer-select" id="filterTransmission" data-filter="transmission"><option value="">All types</option><option>Automatic</option><option>Manual</option></select></div>

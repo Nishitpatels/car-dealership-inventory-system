@@ -7,6 +7,7 @@
   "pages/login.html": "{% url 'authentication:login' %}",
   "pages/admin-login.html": "{% url 'authentication:admin_login' %}",
   "pages/logout.html": "{% url 'authentication:logout' %}",
+  "pages/user-dashboard.html": "{% url 'authentication:user_dashboard' %}",
   "pages/user-profile.html": "{% url 'authentication:profile' %}",
   "pages/register.html": "{% url 'authentication:register' %}",
   "pages/inventory.html": "{% url 'inventory:inventory' %}",
@@ -17,12 +18,20 @@
   "pages/update-vehicle.html": "{% url 'inventory:update_vehicle' %}",
   "pages/delete-confirmation.html": "{% url 'inventory:delete_confirmation' %}",
   "pages/inventory-management.html": "{% url 'inventory:inventory_management' %}",
+  "actions/restock-vehicle.html": "{% url 'inventory:restock_vehicle' %}",
   "pages/dashboard.html": "{% url 'dashboard:dashboard' %}",
   "pages/user-management.html": "{% url 'dashboard:user_management' %}",
+  "actions/deactivate-user.html": "{% url 'dashboard:deactivate_user' %}",
   "pages/profile.html": "{% url 'dashboard:profile' %}",
   "pages/settings.html": "{% url 'dashboard:settings' %}",
-  "pages/purchase-history.html": "{% url 'purchases:purchase_history' %}"
+  "pages/purchase-history.html": "{% url 'purchases:purchase_history' %}",
+  "actions/purchase-vehicle.html": "{% url 'purchases:purchase_vehicle' %}"
 }
+</script>
+{{ dealer_inventory_data|json_script:"dealer-inventory-data" }}
+<script>
+const dealerInventoryData = document.getElementById("dealer-inventory-data");
+window.DealerData = dealerInventoryData ? JSON.parse(dealerInventoryData.textContent) : undefined;
 </script>
 <script id="dealer-auth-state" type="application/json">
 {

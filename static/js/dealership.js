@@ -32,10 +32,26 @@
     const gradient = context.createLinearGradient(0, 0, 0, 280);
     gradient.addColorStop(0, 'rgba(139,92,246,.35)');
     gradient.addColorStop(1, 'rgba(59,130,246,.01)');
+    const chartData = (D && D.revenueChart) ? D.revenueChart : {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      values: [0, 0, 0, 0, 0, 0, 0]
+    };
     window.dealerRevenueChart = new Chart(context, {
       type: 'line',
-      data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'], datasets: [{ data: [286, 324, 301, 368, 410, 424, 486], borderColor: '#8b5cf6', backgroundColor: gradient, borderWidth: 2.5, fill: true, tension: .42, pointRadius: 3, pointBackgroundColor: '#a78bfa' }] },
-      options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(22,22,42,.96)', titleColor: '#ddd6fe', bodyColor: '#d4d4e8', displayColors: false, callbacks: { label: item => ` $${item.parsed.y}k revenue` } } }, scales: { x: { grid: { display: false }, ticks: { color: '#7878a0', font: { family: 'Space Grotesk', size: 11 } } }, y: { border: { display: false }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#7878a0', font: { family: 'Space Grotesk', size: 11 }, callback: value => `$${value}k` } } } }
+      data: {
+        labels: chartData.labels,
+        datasets: [{
+          data: chartData.values,
+          borderColor: '#8b5cf6',
+          backgroundColor: gradient,
+          borderWidth: 2.5,
+          fill: true,
+          tension: .42,
+          pointRadius: 3,
+          pointBackgroundColor: '#a78bfa'
+        }]
+      },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(22,22,42,.96)', titleColor: '#ddd6fe', bodyColor: '#d4d4e8', displayColors: false, callbacks: { label: item => ` $${Number(item.parsed.y).toLocaleString()} revenue` } } }, scales: { x: { grid: { display: false }, ticks: { color: '#7878a0', font: { family: 'Space Grotesk', size: 11 } } }, y: { border: { display: false }, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#7878a0', font: { family: 'Space Grotesk', size: 11 }, callback: value => `$${Number(value).toLocaleString()}` } } } }
     });
   }
 
@@ -73,7 +89,7 @@
   }
 
   function purchase(vehicleId) {
-    const vehicle = D.vehicles.find(item => item.id === vehicleId);
+    const vehicle = D.vehicles.find(item => String(item.id) === String(vehicleId));
     if (!vehicle || vehicle.quantity <= 0) { showToast('Vehicle unavailable', 'This vehicle is currently out of stock.', 'fa-circle-xmark'); return; }
     vehicle.quantity -= 1;
     setStatus(vehicle);
@@ -82,7 +98,7 @@
   }
 
   function changeStock(id, delta) {
-    const vehicle = D.vehicles.find(item => item.id === id);
+    const vehicle = D.vehicles.find(item => String(item.id) === String(id));
     if (!vehicle) return;
     vehicle.quantity = Math.max(0, vehicle.quantity + Number(delta));
     setStatus(vehicle);

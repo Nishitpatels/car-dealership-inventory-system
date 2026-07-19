@@ -96,3 +96,10 @@ def logout(request):
 @login_required_frontend
 def profile(request):
     return render(request, "authentication/profile.html")
+
+
+@login_required_frontend
+def user_dashboard(request):
+    if is_admin_user(request.user):
+        return redirect("dashboard:dashboard")
+    return render(request, "authentication/user_dashboard.html")
