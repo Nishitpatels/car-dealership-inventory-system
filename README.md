@@ -538,22 +538,22 @@ The following screenshots showcase the major features and user interface of the 
 
 
 <p align="center">
-    <img src="static/screenshots/home.png" alt="Home" width="48%">
-    <img src="static/screenshots/home1.png" alt="Home" width="48%">
+    <img src="screenshots/home.png" alt="Home" width="48%">
+    <img src="screenshots/home1.png" alt="Home" width="48%">
 </p>
 
 <p align="center">
-    <img src="static/screenshots/Admin Dashboard.png" alt=" Admin Dashboard" width="48%">
-    <img src="static/screenshots/inventory.png" alt="Inventory" width="48%">
+    <img src="screenshots/Admin Dashboard.png" alt=" Admin Dashboard" width="48%">
+    <img src="screenshots/inventory.png" alt="Inventory" width="48%">
 </p>
 
 <p align="center">
-    <img src="static/screenshots/Search.png" alt="Search" width="48%">
-    <img src="static/screenshots/add vehicle.png" alt="Add Vehicle" width="48%">
+    <img src="screenshots/Search.png" alt="Search" width="48%">
+    <img src="screenshots/add vehicle.png" alt="Add Vehicle" width="48%">
 </p>
 
 <p align="center">
-    <img src="static/screenshots/Test_Results.png" alt="Test_Results" width="48%">
+    <img src="screenshots/Test_Results.png" alt="Test_Results" width="48%">
 </p>
 
 ---
