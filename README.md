@@ -306,7 +306,7 @@ git --version
 ## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/car-dealership-inventory-system.git
+git clone https://github.com/Nishitpatels/car-dealership-inventory-system.git
 ```
 
 Move into the project directory:
